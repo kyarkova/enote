@@ -10,10 +10,13 @@ repositories {
 }
 
 dependencies {
-    testCompile 'org.junit.jupiter:junit-jupiter-api:+'
+    testCompile 'junit:junit:+',
+            'org.junit.jupiter:junit-jupiter-api:+',
+            'com.h2database:h2:+'
     compile 'org.projectlombok:lombok:+',
             'org.springframework:spring-context:+',
             'org.springframework:spring-jdbc:+',
+            'org.springframework:spring-test:+',
             'org.springframework:spring-orm:+',
             'org.hibernate:hibernate-core:5.2.12.Final'
 }

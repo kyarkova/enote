@@ -6,12 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import org.springframework.context.annotation.Lazy;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Set;
 
 @Data
@@ -30,11 +25,15 @@ public class User extends AbstractEntity {
     private String password;
 
     @OneToMany(
-        mappedBy = "user",
-        fetch = FetchType.LAZY,
-        cascade = CascadeType.REMOVE,
-        orphanRemoval = true
+            mappedBy = "user",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.REMOVE,
+            orphanRemoval = true
     )
     private Set<Notebook> notebooks;
+
+    public void addNotebook(Notebook notebook) {
+        this.notebooks.add(notebook);
+    }
 
 }
