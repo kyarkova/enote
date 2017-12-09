@@ -6,15 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import org.springframework.context.annotation.Lazy;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Set;
 
 @Data
@@ -35,10 +28,14 @@ public class Note extends AbstractEntity {
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(
-        name = "note_tag",
-        joinColumns = { @JoinColumn(name = "note_id", nullable = false) },
-        inverseJoinColumns = { @JoinColumn(name = "tag_id", nullable = false) }
+            name = "note_tag",
+            joinColumns = {@JoinColumn(name = "note_id", nullable = false)},
+            inverseJoinColumns = {@JoinColumn(name = "tag_id", nullable = false)}
     )
-    private Set<Tag> tags;
+    private Set<Tag> tags = new HashSet<>();
 
+    public boolean addTag(Tag tag) {
+//        tag.setNote(this);
+        return tags.add(tag);
+    }
 }

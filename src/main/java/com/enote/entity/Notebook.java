@@ -6,15 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import org.springframework.context.annotation.Lazy;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
+import javax.persistence.*;
 import java.util.Set;
 
 @Data
@@ -24,8 +16,8 @@ import java.util.Set;
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
 @Table(
-    name = "notebook",
-    uniqueConstraints = @UniqueConstraint(columnNames={"name", "user_id"})
+        name = "notebook",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"name", "user_id"})
 )
 public class Notebook extends AbstractEntity {
 
@@ -37,11 +29,15 @@ public class Notebook extends AbstractEntity {
     private User user;
 
     @OneToMany(
-        mappedBy = "notebook",
-        fetch = FetchType.LAZY,
-        cascade = CascadeType.REMOVE,
-        orphanRemoval = true
+            mappedBy = "notebook",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.REMOVE,
+            orphanRemoval = true
     )
     private Set<Note> notes;
+
+    public boolean addNote(Note note) {
+        return notes.add(note);
+    }
 
 }
