@@ -1,31 +1,41 @@
 package com.enote.entity;
 
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.Accessors;
-import org.springframework.context.annotation.Lazy;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.NotEmpty;
+import java.util.HashSet;
+import java.util.Set;
 
-@Data
-@Lazy
 @Entity
+@Getter
+@Setter
 @NoArgsConstructor
 @Table(name = "tag")
 @Accessors(chain = true)
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(of = {"name"}, callSuper = false)
 public class Tag extends AbstractEntity {
 
-    @Column(name = "name", nullable = false, unique = true)
+    @NotEmpty
+    @Column(
+        name = "name",
+        nullable = false,
+        unique = true
+    )
     private String name;
 
-//    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "tag")
-//    private Set<Note> notes;
+    @ManyToMany(
+        mappedBy = "tags",
+        fetch = FetchType.EAGER
+    )
+    private Set<Note> notes = new HashSet<>();
 
-//    public void setNote(Note note) {
-//        this.notes.add(note);
-//    }
 }
