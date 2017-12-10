@@ -39,13 +39,14 @@ public class TagServiceTest {
 
     @Test
     public void testCreateTag() {
-        tagService.create("testTagService");
-        assertNotNull(tagRepo.getByName("testTagService"));
+        final String tagName = "testCreateTag";
+        tagService.create(tagName);
+        assertNotNull(tagRepo.getByName(tagName));
     }
 
     @Test(expected = PersistenceException.class)
     public void testCreateTagNonUnique() {
-        final String nonUniqueName = "nonUniqueName";
+        final String nonUniqueName = "testCreateTagNonUnique";
         tagService.create(nonUniqueName);
         tagService.create(nonUniqueName);
     }
@@ -59,7 +60,8 @@ public class TagServiceTest {
 
     @Test
     public void testDeleteExistingTagById() {
-        final Tag testTag = new Tag().setName("testDeleteExistingTagById");
+        final String tagName = "testDeleteExistingTagById";
+        final Tag testTag = new Tag().setName(tagName);
         final long testDeleteById = tagRepo.save(testTag).getId();
         Assert.assertTrue(tagRepo.findById(testDeleteById).isPresent());
         tagService.deleteById(testDeleteById);

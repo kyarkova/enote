@@ -13,6 +13,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -51,10 +52,10 @@ public class NotebookServiceTest {
     }
 
     @Test
-    public void testCreate() {
-        final User user = new User().setLogin("testCreate").setPassword("pass");
-        notebookService.create("testCreate", userService.save(user));
-        final Collection<Notebook> test = notebookService.getByName("testNotebookService");
+    public void testCreateWithNonExistingName() {
+        final User user = new User().setLogin("testCreateWithNonExistingName").setPassword("pass");
+        notebookService.create("testCreateWithNonExistingName", userService.save(user));
+        final Collection<Notebook> test = notebookService.getByName("testCreateWithNonExistingName");
         assertNotNull(test);
         assertFalse(test.isEmpty());
     }
@@ -84,18 +85,18 @@ public class NotebookServiceTest {
     }
 
     @Test
-    public void deleteExistingNotebook() {
-        final User newUser = new User().setLogin("deleteExistingNotebook").setPassword("pass");
+    public void testDeleteExistingNotebook() {
+        final User newUser = new User().setLogin("testDeleteExistingNotebook").setPassword("pass");
         userRepo.save(newUser);
-        final Notebook newNotebook = new Notebook().setName("deleteExistingNotebook").setUser(newUser);
+        final Notebook newNotebook = new Notebook().setName("testDeleteExistingNotebook").setUser(newUser);
         final long id = notebookRepo.save(newNotebook).getId();
         Assert.assertTrue(notebookService.findById(id).isPresent());
         notebookService.deleteById(id);
         assertFalse(notebookService.findById(id).isPresent());
     }
 
-    @Test(expected = PersistenceException.class)
-    public void deleteNonexistentNotebookById() {
+    @Test(expected = EmptyResultDataAccessException.class)
+    public void testDeleteNonexistentNotebookById() {
         final long nonexistentNotebookId = 99L;
         assertFalse(notebookService.findById(nonexistentNotebookId).isPresent());
         notebookService.deleteById(nonexistentNotebookId);

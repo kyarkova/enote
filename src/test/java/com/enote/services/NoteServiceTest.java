@@ -14,6 +14,7 @@ import com.enote.service.NoteService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -54,13 +55,13 @@ public class NoteServiceTest {
     }
 
     @Test
-    public void testCreate() {
-        final User newUser = new User().setLogin("testCreateNote").setPassword("pass");
+    public void testCreateWithNonexistingTitle() {
+        final User newUser = new User().setLogin("testCreateWithNonexistingTitle").setPassword("pass");
         userRepo.save(newUser);
-        final Notebook newNotebook = new Notebook().setName("testCreateNote").setUser(newUser);
+        final Notebook newNotebook = new Notebook().setName("testCreateWithNonexistingTitle").setUser(newUser);
         notebookRepo.save(newNotebook);
-        noteRepo.save(new Note().setTitle("testCreateNote").setNotebook(newNotebook));
-        assertNotNull(noteRepo.getByTitle("testCreateNote"));
+        noteRepo.save(new Note().setTitle("testCreateWithNonexistingTitle").setNotebook(newNotebook));
+        assertNotNull(noteRepo.getByTitle("testCreateWithNonexistingTitle"));
     }
 
     @Test(expected = PersistenceException.class)
@@ -89,17 +90,17 @@ public class NoteServiceTest {
 
     @Test
     public void testDeleteExistingNoteById() {
-        final User newUser = new User().setLogin("deleteExistingNote").setPassword("pass");
+        final User newUser = new User().setLogin("testDeleteExistingNoteById").setPassword("pass");
         userRepo.save(newUser);
-        final Notebook newNotebook = new Notebook().setName("deleteExistingNote").setUser(newUser);
+        final Notebook newNotebook = new Notebook().setName("testDeleteExistingNoteById").setUser(newUser);
         notebookRepo.save(newNotebook);
-        final long id = noteRepo.save(new Note().setTitle("deleteExistingNote").setNotebook(newNotebook)).getId();
+        final long id = noteRepo.save(new Note().setTitle("testDeleteExistingNoteById").setNotebook(newNotebook)).getId();
         assertTrue(noteRepo.findById(id).isPresent());
         noteService.deleteById(id);
         assertFalse(noteRepo.findById(id).isPresent());
     }
 
-    @Test(expected = PersistenceException.class)
+    @Test(expected = EmptyResultDataAccessException.class)
     public void deleteNonexistentNoteById() {
         final long nonexistentNoteId = 99L;
         assertFalse(noteRepo.findById(nonexistentNoteId).isPresent());
