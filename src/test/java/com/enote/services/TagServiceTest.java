@@ -6,7 +6,6 @@ import com.enote.entity.Tag;
 import com.enote.repo.TagRepo;
 import com.enote.service.TagService;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +30,6 @@ public class TagServiceTest {
     TagRepo tagRepo;
 
     @Test
-    @Ignore
     public void testCountTags() {
         int expectedCount = tagRepo.findAll().size();
         long countUsers = tagService.countTags();
@@ -60,7 +58,6 @@ public class TagServiceTest {
     }
 
     @Test
-    @Ignore
     public void testDeleteExistingTagById() {
         final Tag testTag = new Tag().setName("testDeleteExistingTagById");
         final long testDeleteById = tagRepo.save(testTag).getId();
