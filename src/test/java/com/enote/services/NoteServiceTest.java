@@ -11,7 +11,6 @@ import com.enote.repo.NotebookRepo;
 import com.enote.repo.TagRepo;
 import com.enote.repo.UserRepo;
 import com.enote.service.NoteService;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,7 +67,9 @@ public class NoteServiceTest {
     public void testCreateNotUnique() {
         final User newUser = new User().setLogin("testCreateNoteNotUnique").setPassword("pass");
         userRepo.save(newUser);
-        final Notebook newNotebook = new Notebook().setName("testCreateNoteNotUnique").setUser(newUser);
+        final Notebook newNotebook = new Notebook()
+                .setName("testCreateNoteNotUnique")
+                .setUser(newUser);
         notebookRepo.save(newNotebook);
         noteRepo.save(new Note().setTitle("testCreateNoteNotUnique").setNotebook(newNotebook));
         noteRepo.save(new Note().setTitle("testCreateNoteNotUnique").setNotebook(newNotebook));
@@ -93,7 +94,7 @@ public class NoteServiceTest {
         final Notebook newNotebook = new Notebook().setName("deleteExistingNote").setUser(newUser);
         notebookRepo.save(newNotebook);
         final long id = noteRepo.save(new Note().setTitle("deleteExistingNote").setNotebook(newNotebook)).getId();
-        Assert.assertTrue(noteRepo.findById(id).isPresent());
+        assertTrue(noteRepo.findById(id).isPresent());
         noteService.deleteById(id);
         assertFalse(noteRepo.findById(id).isPresent());
     }

@@ -84,20 +84,20 @@ public class NotebookServiceTest {
     }
 
     @Test
-    public void testDeleteById() {
+    public void deleteExistingNotebook() {
         final User newUser = new User().setLogin("deleteExistingNotebook").setPassword("pass");
         userRepo.save(newUser);
         final Notebook newNotebook = new Notebook().setName("deleteExistingNotebook").setUser(newUser);
         final long id = notebookRepo.save(newNotebook).getId();
-        Assert.assertTrue(notebookRepo.findById(id).isPresent());
+        Assert.assertTrue(notebookService.findById(id).isPresent());
         notebookService.deleteById(id);
-        assertFalse(notebookRepo.findById(id).isPresent());
+        assertFalse(notebookService.findById(id).isPresent());
     }
 
     @Test(expected = PersistenceException.class)
     public void deleteNonexistentNotebookById() {
         final long nonexistentNotebookId = 99L;
-        assertFalse(notebookRepo.findById(nonexistentNotebookId).isPresent());
+        assertFalse(notebookService.findById(nonexistentNotebookId).isPresent());
         notebookService.deleteById(nonexistentNotebookId);
     }
 }

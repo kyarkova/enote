@@ -9,6 +9,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -76,7 +77,7 @@ public class UserServiceTest {
         assertFalse(userRepo.findById(id).isPresent());
     }
 
-    @Test(expected = PersistenceException.class)
+    @Test(expected = EmptyResultDataAccessException.class)
     public void deleteNonexistentUserById() {
         final long nonexistentUserId = 99L;
         assertFalse(userRepo.findById(nonexistentUserId).isPresent());
