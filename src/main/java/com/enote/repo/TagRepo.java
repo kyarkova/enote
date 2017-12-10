@@ -16,4 +16,8 @@ public interface TagRepo extends JpaRepository<Tag, Long> {
     @Query("select t from Tag t inner join t.notes n where n.id = :id")
     Collection<Tag> getByNoteId(@Param("id") Long noteId);
 
+    long countTags();
+
+    Tag getById(Long id);
+
 }

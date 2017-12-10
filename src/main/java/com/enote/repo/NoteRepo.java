@@ -18,4 +18,5 @@ public interface NoteRepo extends JpaRepository<Note, Long> {
 
     Collection<Note> getByNotebookId(Long notebookId);
 
+    long countNotes();
 }
