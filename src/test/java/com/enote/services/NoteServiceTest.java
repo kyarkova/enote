@@ -5,11 +5,13 @@ import com.enote.config.PersistenceConfig;
 import com.enote.entity.Note;
 import com.enote.entity.Notebook;
 import com.enote.entity.Tag;
+import com.enote.entity.User;
 import com.enote.repo.NoteRepo;
 import com.enote.repo.NotebookRepo;
 import com.enote.repo.TagRepo;
+import com.enote.repo.UserRepo;
 import com.enote.service.NoteService;
-import org.junit.Ignore;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.PersistenceException;
 import java.util.Collection;
 import java.util.List;
 
@@ -41,18 +44,34 @@ public class NoteServiceTest {
     @Autowired
     TagRepo tagRepo;
 
+    @Autowired
+    UserRepo userRepo;
+
     @Test
     public void testCountNotes() {
+        int expectedCount = noteRepo.findAll().size();
         long countNotes = noteService.countNotes();
-        assertEquals(10, countNotes);
+        assertEquals(expectedCount, countNotes);
     }
 
     @Test
     public void testCreate() {
-        Notebook notebook = notebookRepo.getOne(1L);
-        // FIXME: do not create entities with same unique field values in different tests!
-        noteService.create("testCreateNoteService", notebook);
-        assertNotNull(noteRepo.getByTitle("testCreateNoteService"));
+        final User newUser = new User().setLogin("testCreateNote").setPassword("pass");
+        userRepo.save(newUser);
+        final Notebook newNotebook = new Notebook().setName("testCreateNote").setUser(newUser);
+        notebookRepo.save(newNotebook);
+        noteRepo.save(new Note().setTitle("testCreateNote").setNotebook(newNotebook));
+        assertNotNull(noteRepo.getByTitle("testCreateNote"));
+    }
+
+    @Test(expected = PersistenceException.class)
+    public void testCreateNotUnique() {
+        final User newUser = new User().setLogin("testCreateNoteNotUnique").setPassword("pass");
+        userRepo.save(newUser);
+        final Notebook newNotebook = new Notebook().setName("testCreateNoteNotUnique").setUser(newUser);
+        notebookRepo.save(newNotebook);
+        noteRepo.save(new Note().setTitle("testCreateNoteNotUnique").setNotebook(newNotebook));
+        noteRepo.save(new Note().setTitle("testCreateNoteNotUnique").setNotebook(newNotebook));
     }
 
     @Test
@@ -68,19 +87,31 @@ public class NoteServiceTest {
     }
 
     @Test
-    @Ignore
-    public void testDeleteById() {
-        // FIXME: do not delete entities with ids that are used in other tests
-        // FIXME: you can create a new one here like in RepoTest and then delete it
-//        noteService.deleteById(4L);
-//        assertNull(noteRepo.getOne(4L));
+    public void testDeleteExistingNoteById() {
+        final User newUser = new User().setLogin("deleteExistingNote").setPassword("pass");
+        userRepo.save(newUser);
+        final Notebook newNotebook = new Notebook().setName("deleteExistingNote").setUser(newUser);
+        notebookRepo.save(newNotebook);
+        final long id = noteRepo.save(new Note().setTitle("deleteExistingNote").setNotebook(newNotebook)).getId();
+        Assert.assertTrue(noteRepo.findById(id).isPresent());
+        noteService.deleteById(id);
+        assertFalse(noteRepo.findById(id).isPresent());
+    }
+
+    @Test(expected = PersistenceException.class)
+    public void deleteNonexistentNoteById() {
+        final long nonexistentNoteId = 99L;
+        assertFalse(noteRepo.findById(nonexistentNoteId).isPresent());
+        noteService.deleteById(nonexistentNoteId);
     }
 
     @Test
     @Transactional(timeout = 10)
     public void testAddTag() {
-        Note note = noteRepo.getOne(1L);
-        Tag tag = tagRepo.getOne(1L);
+        final long noteId = 1L;
+        final Note note = noteRepo.getOne(noteId);
+        final long tagId = 1L;
+        final Tag tag = tagRepo.getOne(tagId);
         noteService.addTag(note, tag);
         assertTrue(note.getTags().contains(tag));
     }

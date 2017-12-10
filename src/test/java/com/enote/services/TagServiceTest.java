@@ -5,6 +5,7 @@ import com.enote.config.PersistenceConfig;
 import com.enote.entity.Tag;
 import com.enote.repo.TagRepo;
 import com.enote.service.TagService;
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,7 +14,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.List;
+import javax.persistence.PersistenceException;
 
 import static org.junit.Assert.*;
 
@@ -31,9 +32,9 @@ public class TagServiceTest {
     @Test
     @Ignore
     public void testCountTags() {
-        // TODO: count tags in test data and don't forget about created during test session
-//        long countUsers = tagService.countTags();
-//        assertEquals(4, countUsers);
+        int expectedCount = tagRepo.findAll().size();
+        long countUsers = tagService.countTags();
+        assertEquals(expectedCount, countUsers);
     }
 
 
@@ -43,16 +44,34 @@ public class TagServiceTest {
         assertNotNull(tagRepo.getByName("testTagService"));
     }
 
+    @Test(expected = PersistenceException.class)
+    public void testCreateTagNonUnique() {
+        final String nonUniqueName = "nonUniqueName";
+        tagService.create(nonUniqueName);
+        tagService.create(nonUniqueName);
+    }
+
     @Test
     public void testFindAll() {
-        List<Tag> all = tagService.findAll();
-        assertNotNull(all);
+        int expected = tagRepo.findAll().size();
+        int actual = tagService.findAll().size();
+        assertEquals(expected, actual);
     }
 
     @Test
     @Ignore
-    public void testDeleteById() {
-//        tagService.deleteById(4L);
-//        assertNull(tagRepo.getOne(4L));
+    public void testDeleteExistingTagById() {
+        final Tag testTag = new Tag().setName("testDeleteExistingTagById");
+        final long testDeleteById = tagRepo.save(testTag).getId();
+        Assert.assertTrue(tagRepo.findById(testDeleteById).isPresent());
+        tagService.deleteById(testDeleteById);
+        assertFalse(tagRepo.findById(testDeleteById).isPresent());
+    }
+
+    @Test(expected = PersistenceException.class)
+    public void deleteNonexistentNoteById() {
+        final long nonexistentTagId = 99L;
+        assertFalse(tagRepo.findById(nonexistentTagId).isPresent());
+        tagService.deleteById(nonexistentTagId);
     }
 }

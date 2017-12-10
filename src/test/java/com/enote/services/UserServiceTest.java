@@ -5,7 +5,7 @@ import com.enote.config.PersistenceConfig;
 import com.enote.entity.User;
 import com.enote.repo.UserRepo;
 import com.enote.service.UserService;
-import org.junit.Ignore;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +13,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.List;
+import javax.persistence.PersistenceException;
 import java.util.Optional;
 
 import static org.junit.Assert.*;
@@ -32,33 +32,54 @@ public class UserServiceTest {
 
     @Test
     public void testCountUsers() {
+        int expectedCount = userRepo.findAll().size();
         long countUsers = userService.countUsers();
-        assertEquals(4, countUsers);
+        assertEquals(expectedCount, countUsers);
     }
-
 
     @Test
     public void testCreateUser() {
-        userService.create("loginUserTest", "test");
-        assertNotNull(userRepo.getByLogin("loginUserTest"));
+        final String login = "testCreateUser";
+        userService.create(login, "test");
+        assertNotNull(userRepo.getByLogin(login));
+    }
+
+    @Test(expected = PersistenceException.class)
+    public void testCreateuserNonUnique() {
+        final String nonUniqueName = "nonUniqueName";
+        final String password = "pass";
+        userService.create(nonUniqueName, password);
+        userService.create(nonUniqueName, password);
     }
 
     @Test
     public void testFindAll() {
-        List<User> all = userService.findAll();
-        assertNotNull(all);
+        int expected = userRepo.findAll().size();
+        int actual = userService.findAll().size();
+        assertEquals(expected, actual);
     }
 
     @Test
     public void testFindById() {
-        Optional<User> user = userService.findById(1L);
+        final User newUser = new User().setLogin("testFindById").setPassword("pass");
+        Long id = userRepo.save(newUser).getId();
+        Optional<User> user = userService.findById(id);
         assertTrue(user.isPresent());
     }
 
     @Test
-    @Ignore
-    public void testDeleteById() {
-//        userService.deleteById(4L);
-//        assertNull(userRepo.getOne(4L));
+    public void testDeletExistentUserById() {
+        final User newUser = new User().setLogin("deleteExistingUser").setPassword("pass");
+        Long id = userRepo.save(newUser).getId();
+        Assert.assertTrue(userRepo.findById(id).isPresent());
+        userService.deleteById(id);
+        assertFalse(userRepo.findById(id).isPresent());
+    }
+
+    @Test(expected = PersistenceException.class)
+    public void deleteNonexistentUserById() {
+        final long nonexistentUserId = 99L;
+        assertFalse(userRepo.findById(nonexistentUserId).isPresent());
+        userService.deleteById(nonexistentUserId);
     }
 }

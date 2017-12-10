@@ -4,18 +4,20 @@ import com.enote.config.AppConfig;
 import com.enote.config.PersistenceConfig;
 import com.enote.entity.Notebook;
 import com.enote.entity.User;
+import com.enote.repo.NotebookRepo;
+import com.enote.repo.UserRepo;
 import com.enote.service.NoteService;
 import com.enote.service.NotebookService;
 import com.enote.service.UserService;
-import org.junit.Ignore;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.PersistenceException;
 import java.util.Collection;
 import java.util.List;
 
@@ -35,20 +37,37 @@ public class NotebookServiceTest {
     @Autowired
     NoteService noteService;
 
+    @Autowired
+    UserRepo userRepo;
+
+    @Autowired
+    NotebookRepo notebookRepo;
+
     @Test
     public void testCountNotebooks() {
+        int expectedCount = notebookRepo.findAll().size();
         long countNotebooks = notebookService.countNotebooks();
-        assertEquals(8, countNotebooks);
+        assertEquals(expectedCount, countNotebooks);
     }
 
     @Test
     public void testCreate() {
-        // TODO: better logins, names for entities, but they must be unique!
-        User user = userService.getByLogin("user2");
-        notebookService.create("testNotebookService", userService.save(user));
+        final User user = new User().setLogin("testCreate").setPassword("pass");
+        notebookService.create("testCreate", userService.save(user));
         final Collection<Notebook> test = notebookService.getByName("testNotebookService");
         assertNotNull(test);
         assertFalse(test.isEmpty());
+    }
+
+    @Test(expected = PersistenceException.class)
+    public void createNotebookWithExistingName() {
+        final User sameUser = new User()
+                .setLogin("testCreateNotebookWithExistingName")
+                .setPassword("pass");
+        userRepo.save(sameUser);
+        final String sameName = "sameName";
+        notebookService.create(sameName, sameUser);
+        notebookService.create(sameName, sameUser);
     }
 
     @Test
@@ -65,13 +84,20 @@ public class NotebookServiceTest {
     }
 
     @Test
-    @Ignore
     public void testDeleteById() {
-//        assertTrue(notebookService.findById(4L).isPresent());
-//        assertTrue(noteService.findById(6L).isPresent()); // Note 6 is in Notebook 4
-//        notebookService.deleteById(4L); // TODO: det rid of magic values
-//        assertFalse(notebookService.findById(4L).isPresent());
-//        assertFalse(noteService.findById(6L).isPresent());
+        final User newUser = new User().setLogin("deleteExistingNotebook").setPassword("pass");
+        userRepo.save(newUser);
+        final Notebook newNotebook = new Notebook().setName("deleteExistingNotebook").setUser(newUser);
+        final long id = notebookRepo.save(newNotebook).getId();
+        Assert.assertTrue(notebookRepo.findById(id).isPresent());
+        notebookService.deleteById(id);
+        assertFalse(notebookRepo.findById(id).isPresent());
     }
 
+    @Test(expected = PersistenceException.class)
+    public void deleteNonexistentNotebookById() {
+        final long nonexistentNotebookId = 99L;
+        assertFalse(notebookRepo.findById(nonexistentNotebookId).isPresent());
+        notebookService.deleteById(nonexistentNotebookId);
+    }
 }
