@@ -18,4 +18,6 @@ public interface NoteRepo extends JpaRepository<Note, Long> {
 
     Collection<Note> getByNotebookId(Long notebookId);
 
+    @Query("select count(id) from Note n")
+    Long countNotes();
 }

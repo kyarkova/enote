@@ -2,6 +2,7 @@ package com.enote.repo;
 
 import com.enote.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -13,4 +14,9 @@ public interface UserRepo extends JpaRepository<User, Long> {
 
     User getByLogin(String login);
 
+    @Query("select u from User u where u.id= :id")
+    User findOneById(Long id);
+
+    @Query("select count(id) from User u")
+    Long countUsers();
 }
