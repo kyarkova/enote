@@ -4,16 +4,21 @@ package com.enote.service;
 import com.enote.entity.User;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface UserService {
 
-    long countUsers();
+    User save(User user);
+
+    Long countUsers();
 
     void create(String login, String password);
 
+    User getByLogin(String login);
+
     List<User> findAll();
 
-    User findById(Long id);
+    Optional<User> findById(Long id);
 
     void deleteById(Long id);
 }

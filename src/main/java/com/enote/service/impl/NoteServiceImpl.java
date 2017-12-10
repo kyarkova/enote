@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -26,7 +27,7 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
-    public long countNotes() {
+    public Long countNotes() {
         return noteRepo.countNotes();
     }
 
@@ -43,6 +44,11 @@ public class NoteServiceImpl implements NoteService {
     @Override
     public List<Note> findAll() {
         return noteRepo.findAll();
+    }
+
+    @Override
+    public Optional<Note> findById(Long id) {
+        return noteRepo.findById(id);
     }
 
     @Override

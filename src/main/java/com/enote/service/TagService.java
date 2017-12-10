@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface TagService {
 
-    long countTags();
+    Long countTags();
 
     void create(String name);
 

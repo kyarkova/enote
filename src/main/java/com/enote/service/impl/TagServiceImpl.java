@@ -22,7 +22,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public long countTags() {
+    public Long countTags() {
         return tagRepo.countTags();
     }
 

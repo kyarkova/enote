@@ -4,16 +4,19 @@ import com.enote.config.AppConfig;
 import com.enote.config.PersistenceConfig;
 import com.enote.entity.Notebook;
 import com.enote.entity.User;
-import com.enote.repo.NotebookRepo;
-import com.enote.repo.UserRepo;
+import com.enote.service.NoteService;
 import com.enote.service.NotebookService;
+import com.enote.service.UserService;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -27,10 +30,10 @@ public class NotebookServiceTest {
     NotebookService notebookService;
 
     @Autowired
-    UserRepo userRepo;
+    UserService userService;
 
     @Autowired
-    NotebookRepo notebookRepo;
+    NoteService noteService;
 
     @Test
     public void testCountNotebooks() {
@@ -40,9 +43,12 @@ public class NotebookServiceTest {
 
     @Test
     public void testCreate() {
-        User user = userRepo.getByLogin("user1");
-        notebookService.create("test", user);
-        assertNotNull(notebookRepo.getByName("test"));
+        // TODO: better logins, names for entities, but they must be unique!
+        User user = userService.getByLogin("user2");
+        notebookService.create("testNotebookService", userService.save(user));
+        final Collection<Notebook> test = notebookService.getByName("testNotebookService");
+        assertNotNull(test);
+        assertFalse(test.isEmpty());
     }
 
     @Test
@@ -53,15 +59,19 @@ public class NotebookServiceTest {
 
     @Test
     public void testFindByUser() {
-        User user = userRepo.getByLogin("user1");
+        User user = userService.getByLogin("user1");
         List<Notebook> list = notebookService.findAllByUser(user);
         assertNotNull(list);
     }
 
     @Test
+    @Ignore
     public void testDeleteById() {
-        notebookService.deleteById(4L);
-        assertNull(notebookRepo.getOne(4L));
+//        assertTrue(notebookService.findById(4L).isPresent());
+//        assertTrue(noteService.findById(6L).isPresent()); // Note 6 is in Notebook 4
+//        notebookService.deleteById(4L); // TODO: det rid of magic values
+//        assertFalse(notebookService.findById(4L).isPresent());
+//        assertFalse(noteService.findById(6L).isPresent());
     }
 
 }

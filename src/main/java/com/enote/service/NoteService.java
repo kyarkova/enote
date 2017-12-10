@@ -6,14 +6,20 @@ import com.enote.entity.Tag;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public interface NoteService {
-    long countNotes();
+
+    Long countNotes();
 
     void create(String title, Notebook notebook);
 
     List<Note> findAll();
+
+    Optional<Note> findById(Long id);
+
+
 
     Collection<Note> findAllByNotebook(Notebook notebook);
 
