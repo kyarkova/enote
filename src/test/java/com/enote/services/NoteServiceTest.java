@@ -101,7 +101,7 @@ public class NoteServiceTest {
     }
 
     @Test(expected = EmptyResultDataAccessException.class)
-    public void deleteNonexistentNoteById() {
+    public void testDeleteNonexistentNoteById() {
         final long nonexistentNoteId = 99L;
         assertFalse(noteRepo.findById(nonexistentNoteId).isPresent());
         noteService.deleteById(nonexistentNoteId);
