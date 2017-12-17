@@ -78,4 +78,14 @@ public class NoteServiceImpl implements NoteService {
     public void addTag(Note note, Tag tag) {
         note.getTags().add(tag);
     }
+
+    @Override
+    public void create(Note note) {
+        noteRepo.save(note);
+    }
+
+    @Override
+    public void update(Note note) {
+        noteRepo.save(note);
+    }
 }

@@ -14,11 +14,14 @@ dependencies {
     testCompile 'junit:junit:+',
             'org.junit.jupiter:junit-jupiter-api:+',
             'com.h2database:h2:+',
-            'org.springframework:spring-test:+'
+            'org.springframework:spring-test:+',
+            'org.mockito:mockito-core:+',
+            'org.hamcrest:hamcrest-all:+'
 
     compile 'org.projectlombok:lombok:+',
             'org.springframework:spring-context:+',
             'org.springframework:spring-orm:+',
+            'org.springframework:spring-webmvc:+',
             'org.springframework.data:spring-data-jpa:+',
             'org.hibernate:hibernate-core:+',
             'org.hibernate:hibernate-validator:+',

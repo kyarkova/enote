@@ -19,8 +19,6 @@ public interface NoteService {
 
     Optional<Note> findById(Long id);
 
-
-
     Collection<Note> findAllByNotebook(Notebook notebook);
 
     void addTag(Note note, Set<Tag> tags);
@@ -30,4 +28,8 @@ public interface NoteService {
     void deleteById(Long id);
 
     void addTag(Note note, Tag tag);
+
+    void create(Note note);
+
+    void update(Note note);
 }
