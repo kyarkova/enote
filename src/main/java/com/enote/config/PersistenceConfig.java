@@ -16,7 +16,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import javax.persistence.EntityManagerFactory;
 
 @Configuration
-@EnableJpaRepositories(basePackages = {"com.enote.repo","com.enote.service"})
+@EnableJpaRepositories(basePackages = {"com.enote.repo","com.enote.service","com.enote.controller"})
 public class PersistenceConfig {
 
     private final DataConfig dataConfig;

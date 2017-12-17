@@ -1,12 +1,17 @@
 package com.enote.controller;
 
+import com.enote.config.AppConfig;
+import com.enote.config.PersistenceConfig;
 import com.enote.entity.Note;
 import com.enote.entity.Notebook;
 import com.enote.service.NoteService;
+import org.h2.server.web.WebApp;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -14,11 +19,13 @@ import java.util.List;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = {PersistenceConfig.class, AppConfig.class, WebApp.class})
 public class NoteControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -27,6 +34,13 @@ public class NoteControllerTest {
 
     @Mock
     private NoteService mockNoteService;
+
+    @Before
+    public void setUp() {
+        assertNotNull(noteController);
+        assertNotNull(mockNoteService);
+        assertNotNull(mockMvc);
+    }
 
     @Test
     public void testGetList() throws Exception {
@@ -41,7 +55,6 @@ public class NoteControllerTest {
 
     @Test
     public void testAdd() throws Exception {
-        Note note = new Note();
         mockMvc.perform(
                 post("/notebook/99/note"))
                 .andExpect(status().isCreated());
@@ -69,5 +82,4 @@ public class NoteControllerTest {
         mockMvc.perform(delete("/note/{noteId}", noteId))
                 .andExpect(status().isOk());
     }
-
 }
