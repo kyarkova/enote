@@ -5,7 +5,6 @@ import com.enote.config.PersistenceConfig;
 import com.enote.entity.Note;
 import com.enote.entity.Notebook;
 import com.enote.service.NoteService;
-import org.h2.server.web.WebApp;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,7 +24,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {PersistenceConfig.class, AppConfig.class, WebApp.class})
+@ContextConfiguration(classes = {PersistenceConfig.class, AppConfig.class})
 public class NoteControllerTest {
     @Autowired
     private MockMvc mockMvc;
