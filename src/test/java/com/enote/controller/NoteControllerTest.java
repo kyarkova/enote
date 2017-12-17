@@ -12,33 +12,39 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import java.util.List;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
+@WebAppConfiguration
 @ContextConfiguration(classes = {PersistenceConfig.class, AppConfig.class})
 public class NoteControllerTest {
     @Autowired
-    private MockMvc mockMvc;
+    private WebApplicationContext context;
     @Autowired
     private NoteController noteController;
 
     @Mock
     private NoteService mockNoteService;
 
+    private MockMvc mockMvc;
+
     @Before
-    public void setUp() {
-        assertNotNull(noteController);
-        assertNotNull(mockNoteService);
-        assertNotNull(mockMvc);
+    public void setup() {
+        mockMvc = MockMvcBuilders
+                .webAppContextSetup(context)
+                .build();
+
     }
 
     @Test
